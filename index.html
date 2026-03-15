@@ -230,23 +230,36 @@
   .content-body { padding: 6px 8px; }
 
   .status-box {
-    border: 1px solid #b0b0b0;
-    background: #f8f8f8;
-    padding: 5px 10px;
-    font-size: 11px;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    color: #333;
+    border: 1px solid #999;
+    background: #fff;
+    padding: 8px 10px 8px 10px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    position: relative;
   }
-  .status-icon {
-    width: 16px; height: 16px;
-    background: #1b5faa;
-    border-radius: 50%;
-    color: #fff;
+  .status-box-hdr {
+    position: absolute;
+    top: -8px;
+    left: 6px;
+    background: #fff;
     font-weight: bold;
-    font-size: 11px;
+    font-size: 12px;
+    color: #333;
+    padding-right: 6px;
+  }
+  .status-body { display: flex; align-items: center; gap: 7px; }
+  .status-icon {
+    width: 18px; height: 18px;
+    background: radial-gradient(circle at 40% 35%, #e8f0ff, #a0b8e8);
+    border-radius: 50%;
+    border: 1px solid #7a90b8;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.35), inset 0 1px 1px rgba(255,255,255,0.7);
+    color: #1b3f8a;
+    font-weight: bold;
+    font-size: 12px;
+    font-style: italic;
+    font-family: Georgia, serif;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
@@ -289,7 +302,7 @@
   }
   .pinfo h3 { font-size: 14px; font-weight: bold; color: #1b365d; }
   .pinfo p { font-size: 11px; color: #444; margin-top: 3px; line-height: 1.5; }
-  .online-dot { display: inline-block; width: 8px; height: 8px; background: #00aa00; border-radius: 50%; margin-right: 3px; }
+  .online-dot { display: inline-block; width: 14px; height: 14px; background: #4a9e4a; border: 1px solid #2e7a2e; margin-right: 4px; vertical-align: middle; text-align: center; line-height: 13px; font-size: 11px; font-weight: bold; color: #fff; }
   .sep { border: none; border-top: 1px solid #ddd; margin: 5px 0; }
   .req-legend { font-size: 10px; color: #cc0000; margin-bottom: 4px; }
 
@@ -297,7 +310,7 @@
   .ftable { width: 100%; border-collapse: collapse; }
   .ftable td { padding: 3px 5px; vertical-align: middle; font-size: 12px; }
   .flabel { width: 150px; font-weight: bold; color: #333; text-align: right; padding-right: 8px; white-space: nowrap; }
-  .flabel .req { color: #cc0000; font-size: 11px; }
+  .flabel .req { color: #000; font-size: 11px; }
   .fval .fro {
     background: #f8f8f8;
     border: 1px solid #b0b0b0;
@@ -503,7 +516,7 @@
     <div class="page-title-bar">
       <h2>End User Configuration</h2>
       <div class="page-actions">
-        <button class="abtn primary">Save</button>
+        <button class="abtn">Save</button>
         <button class="abtn">Reset</button>
         <button class="abtn">Apply Config</button>
         <button class="abtn">Add New</button>
@@ -513,39 +526,46 @@
     <div class="content-body">
 
       <div class="status-box">
-        <div class="status-icon">i</div>
-        <span>Status: Record Active — Last modified 2026-03-10 09:14:22 by system. &nbsp;
-          <span style="color:#007000;font-weight:bold;">Configuration saved successfully.</span>
-        </span>
+        <div class="status-box-hdr">Status</div>
+        <div class="status-body">
+          <div class="status-icon">i</div>
+          <span style="color:#444;">Update successful</span>
+        </div>
       </div>
 
-      <!-- User Information -->
+      <!-- Background -->
       <div class="sbox">
-        <div class="shdr"><span class="shdr-text">User Information</span></div>
+        <div class="shdr"><span class="shdr-text">Background</span></div>
         <div class="sbody">
           <div class="profile-row">
             <div class="avatar">KS</div>
             <div class="pinfo">
               <h3>Sampson, Kyle</h3>
-              <p><span class="online-dot"></span>Registered &amp; Active &nbsp;|&nbsp; User ID: <strong>KyleSampson</strong> &nbsp;|&nbsp; Dept: Engineering &nbsp;</p>
+              <p><span class="online-dot">&#10003;</span>Registered &amp; Active &nbsp;|&nbsp; User ID: <strong>KyleSampson</strong> &nbsp;|&nbsp; Dept: Telecom &nbsp;</p>
               <p>Unified Communications Engineer with 5+ years of experience supporting enterprise UC infrastructure. Expertise in Cisco collaboration platforms, endpoint administration, and voice system troubleshooting.</p>
             </div>
           </div>
-          <hr class="sep">
-          <div class="req-legend">* indicates required field</div>
-          <div class="two-col">
-            <table class="ftable">
-              <tr><td class="flabel">User ID <span class="req">*</span></td><td class="fval"><span class="fro">kylesampson</span></td></tr>
-              <tr><td class="flabel">Last Name <span class="req">*</span></td><td class="fval"><span class="fro">Sampson</span></td></tr>
-              <tr><td class="flabel">First Name</td><td class="fval"><span class="fro">Kyle</span></td></tr>
-              <tr><td class="flabel">Title</td><td class="fval"><span class="fro">UC Engineer</span></td></tr>
-              <tr><td class="flabel">Department</td><td class="fval"><span class="fro">Engineering – Infrastructure</span></td></tr>
-            </table>
-            <table class="ftable">
-              <tr><td class="flabel">Email Address</td><td class="fval"><span class="fro"><a href="#">kylesampson52@hotmail.com</a></span></td></tr>
-              <tr><td class="flabel">Location</td><td class="fval"><span class="fro">Bemidji, MN</span></td></tr>
-            </table>
+
+          <!-- Nested User Information -->
+          <div class="sbox" style="margin:10px 0 4px 0;">
+            <div class="shdr"><span class="shdr-text">User Information</span></div>
+            <div class="sbody">
+              <div class="two-col">
+                <table class="ftable">
+                  <tr><td class="flabel">User ID <span class="req">*</span></td><td class="fval"><span class="fro">KyleSampson</span></td></tr>
+                  <tr><td class="flabel">First Name</td><td class="fval"><span class="fro">Kyle</span></td></tr>
+                  <tr><td class="flabel">Last Name <span class="req">*</span></td><td class="fval"><span class="fro">Sampson</span></td></tr>
+                  <tr><td class="flabel">Title</td><td class="fval"><span class="fro">UC Engineer</span></td></tr>
+                  <tr><td class="flabel">Department</td><td class="fval"><span class="fro">Telecom</span></td></tr>
+                </table>
+                <table class="ftable">
+                  <tr><td class="flabel">Email Address</td><td class="fval"><span class="fro"><a href="#">kylesampson52@hotmail.com</a></span></td></tr>
+                  <tr><td class="flabel">Location</td><td class="fval"><span class="fro">Bemidji, MN</span></td></tr>
+                </table>
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
 
@@ -560,7 +580,7 @@
                 <td class="dcol-date">2024 — Present</td>
                 <td class="dcol-org">Sanford Health</td>
                 <td class="dcol-role">UC Engineer</td>
-                <td class="dcol-desc">Promoted to UC Engineer role. Responsible for design, implementation, and support of enterprise Cisco Unified Communications infrastructure across the organization.</td>
+                <td class="dcol-desc">Led the migration of 500+ endpoints to Cisco Unified Communications — streamlining infrastructure, improving reliability, and reducing annual circuit costs by approximately $5,000.</td>
                 <td style="text-align:center;"><span style="display:inline-block;width:13px;height:13px;border:2px solid #555;background:#fff;text-align:center;line-height:11px;font-size:11px;font-weight:bold;color:#000;">&#10003;</span></td>
               </tr>
               <tr>
@@ -609,6 +629,7 @@
               <td class="fval">
                 <select multiple size="5" style="width:320px;font-family:Arial,sans-serif;font-size:12px;border:1px solid #b0b0b0;background:#fff;padding:2px;color:#000;">
                   <option>Cisco CUCM / UC</option>
+                  <option>Webex Contact Center</option>
                   <option>Mitel 3300</option>
                   <option>C# / Programming</option>
                   <option>Networking / CCNA</option>
