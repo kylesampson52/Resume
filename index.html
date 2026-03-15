@@ -195,7 +195,7 @@
   .lnav-item.active { background: #dce8f5; font-weight: bold; color: #000; }
 
   /* ── MAIN ── */
-  .main-content { flex: 1; overflow: auto; }
+  .main-content { flex: 1; overflow: auto; position: relative; }
 
   /* PAGE TITLE BAR */
   .page-title-bar {
@@ -443,6 +443,27 @@
     .content-body { padding: 4px; }
     .abtn { padding: 2px 6px; font-size: 11px; }
   }
+
+  /* ── LOADING OVERLAY ── */
+  #cucm-loading {
+    position: absolute; inset: 0; background: #fff;
+    z-index: 9999; display: flex; align-items: center; justify-content: center;
+    opacity: 1; transition: opacity 0.4s ease;
+  }
+  #cucm-loading-box {
+    background: #1e5f8a; color: #fff;
+    font-size: 14px; font-weight: bold;
+    padding: 18px 48px; min-width: 300px; text-align: center;
+    border: 1px solid #14486b;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.35);
+    letter-spacing: 0.01em;
+  }
+
+  /* ── SECTION REVEAL ── */
+  .page-title-bar, .status-box, .content-body > .sbox {
+    opacity: 0; transition: opacity 0.35s ease;
+  }
+  .revealed { opacity: 1 !important; }
 </style>
 </head>
 <body>
@@ -557,6 +578,11 @@
 
 <!-- MAIN CONTENT -->
   <div class="main-content">
+
+    <!-- LOADING OVERLAY -->
+    <div id="cucm-loading">
+      <div id="cucm-loading-box">Loading, please wait.</div>
+    </div>
 
     <div class="page-title-bar">
       <h2>End User Configuration</h2>
@@ -732,5 +758,25 @@
   <p>For information about Cisco Unified Communications Manager please visit our <a href="#">Unified Communications System Documentation</a> web site. &nbsp; For Cisco Technical Support please visit our <a href="#">Technical Support</a> web site.</p>
 </div>
 
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var overlay = document.getElementById('cucm-loading');
+
+    // Fade out overlay after 1.8s
+    setTimeout(function () {
+      overlay.style.opacity = '0';
+      setTimeout(function () { overlay.style.display = 'none'; }, 400);
+    }, 1800);
+
+    // Stagger-reveal sections
+    var sections = Array.from(
+      document.querySelectorAll('.page-title-bar, .status-box, .content-body > .sbox')
+    );
+    sections.forEach(function (el, i) {
+      setTimeout(function () { el.classList.add('revealed'); }, 1950 + i * 180);
+    });
+  });
+</script>
 </body>
 </html>
