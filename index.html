@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cisco Unified CM Administration</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; background: #fff; color: #000; }
+  a { color: #003399; text-decoration: none; cursor: pointer; }
+  a:hover { text-decoration: underline; color: #cc0000; }
+
+  /* ── HEADER (dark teal-blue gradient, matches CUCM 12.5) ── */
+  .cisco-header {
+    background: linear-gradient(to right, #eaf6fa 0%, #5a9db0 35%, #1a3f5c 100%);
+    border-bottom: 2px solid #0f2a3d;
+    padding: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+  }
+  .cisco-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+  }
+  /* Cisco bridge logo */
+  .cisco-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .cisco-bridge {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 18px;
+  }
+  .cisco-bridge span {
+    display: block;
+    width: 4px;
+    background: #4a9fd4;
+    border-radius: 2px 2px 0 0;
+  }
+  .cisco-bridge span:nth-child(1) { height: 8px; }
+  .cisco-bridge span:nth-child(2) { height: 13px; }
+  .cisco-bridge span:nth-child(3) { height: 18px; }
+  .cisco-bridge span:nth-child(4) { height: 18px; }
+  .cisco-bridge span:nth-child(5) { height: 18px; }
+  .cisco-bridge span:nth-child(6) { height: 13px; }
+  .cisco-bridge span:nth-child(7) { height: 8px; }
+  .cisco-wordmark {
+    font-size: 18px;
+    font-weight: bold;
+    color: #cc0000;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    font-family: Arial, sans-serif;
+  }
+  .cisco-header-title { border-left: 1px solid rgba(255,255,255,0.3); padding-left: 12px; margin-left: 4px; }
+  .cisco-header-title h1 { font-size: 15px; font-weight: bold; color: #1b365d; line-height: 1.3; }
+  .cisco-header-title p { font-size: 11px; color: #1b365d; font-style: italic; font-weight: bold; }
+
+  .cisco-header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 6px 10px;
+    font-size: 11px;
+    background: transparent;
+    min-width: 340px;
+  }
+  .nav-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #fff;
+  }
+  .nav-row label { color: #fff; font-weight: normal; }
+  .nav-select {
+    font-size: 11px;
+    padding: 1px 3px;
+    border: 1px solid #999;
+    background: #fff;
+    color: #000;
+    min-width: 200px;
+  }
+  .go-btn {
+    background: linear-gradient(180deg, #f0f0f0, #d8d8d8);
+    border: 1px solid #888;
+    padding: 1px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    color: #000;
+  }
+  .go-btn:hover { background: linear-gradient(180deg, #e0e0e0, #c8c8c8); }
+  .admin-row {
+    display: flex;
+    gap: 0;
+    font-size: 11px;
+    color: #fff;
+  }
+  .admin-row span { font-weight: bold; color: #fff; }
+  .admin-row .pipe { color: rgba(255,255,255,0.5); margin: 0 6px; }
+  .admin-row a { color: #fff; }
+
+  /* ── NAV BAR (medium blue, matches 12.5) ── */
+  .nav-bar {
+    background: #d4d0c8;
+    border-bottom: 1px solid #a8a49c;
+    display: flex;
+    position: relative;
+  }
+  .nav-item { position: relative; display: inline-block; }
+  .nav-item > a {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .nav-item > a:hover,
+  .nav-item.open > a { background: rgba(0,0,0,0.25); text-decoration: none; }
+  .nav-arrow { font-size: 8px; color: #555; }
+  .dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    border: 1px solid #aaa;
+    border-top: 2px solid #3f62a0;
+    min-width: 190px;
+    z-index: 100;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.25);
+  }
+  .nav-item:hover .dropdown { display: block; }
+  .dropdown a {
+    display: block;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: #003399;
+    text-decoration: none;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+    font-weight: normal;
+  }
+  .dropdown a:hover,
+  .dropdown a.hl { background: #3f62a0; color: #fff; text-decoration: none; }
+
+  /* ── BREADCRUMB ── */
+  .breadcrumb {
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+    padding: 3px 10px;
+    font-size: 11px;
+    color: #555;
+  }
+  .breadcrumb a { color: #003399; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb span { color: #999; margin: 0 3px; }
+
+  /* ── LAYOUT ── */
+  .page-wrapper { display: flex; min-height: calc(100vh - 110px); }
+
+  /* ── LEFT NAV ── */
+  .left-nav { width: 160px; min-width: 160px; background: #f0f0f0; border-right: 1px solid #c8c8c8; }
+  .lnav-hdr {
+    background: linear-gradient(180deg, #e2e2e1, #dcdcdb);
+    color: #333;
+    font-weight: bold;
+    font-size: 11px;
+    padding: 4px 8px;
+    cursor: default;
+  }
+  .lnav-item {
+    display: block;
+    padding: 3px 8px 3px 16px;
+    font-size: 11px;
+    color: #003399;
+    text-decoration: none;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+  }
+  .lnav-item:hover { background: #dce8f5; text-decoration: underline; }
+  .lnav-item.active { background: #dce8f5; font-weight: bold; color: #000; }
+
+  /* ── MAIN ── */
+  .main-content { flex: 1; overflow: auto; }
+
+  /* PAGE TITLE BAR */
+  .page-title-bar {
+    background: #fff;
+    border-bottom: 1px solid #c8c8c8;
+    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .page-title-bar h2 { font-size: 13px; font-weight: bold; color: #000; }
+  .page-actions { display: flex; gap: 4px; align-items: center; }
+  .abtn {
+    background: linear-gradient(180deg, #f2f2f2, #d8d8d8);
+    border: 1px solid #888;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #000;
+    white-space: nowrap;
+  }
+  .abtn:hover { background: linear-gradient(180deg, #e8e8e8, #c8c8c8); }
+  .abtn.primary {
+    background: linear-gradient(180deg, #e2e2e1, #dcdcdb);
+    color: #fff;
+    border-color: #2a4880;
+  }
+  .abtn.primary:hover { background: linear-gradient(180deg, #7a9fd7, #4f72b0); }
+
+  /* CONTENT */
+  .content-body { padding: 6px 8px; }
+
+  .status-box {
+    border: 1px solid #b0b0b0;
+    background: #f8f8f8;
+    padding: 5px 10px;
+    font-size: 11px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #333;
+  }
+  .status-icon {
+    width: 16px; height: 16px;
+    background: #1b5faa;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: bold;
+    font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* SECTION BOX */
+  .sbox { border: 1px solid #999; margin-bottom: 14px; margin-top: 10px; position: relative; padding-top: 10px; }
+  .shdr {
+    position: absolute;
+    top: -8px;
+    left: 6px;
+    right: 6px;
+    background: #fff;
+    color: #333;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    cursor: default;
+    user-select: none;
+  }
+  .shdr-text { background: #fff; padding-right: 6px; white-space: nowrap; }
+  .shdr::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid #999;
+  }
+  .stgl { display: none; }
+  .sbody { background: #fff; padding: 7px 8px; }
+
+  /* PROFILE */
+  .profile-row { display: flex; align-items: flex-start; gap: 12px; padding: 2px 0 6px; }
+  .avatar {
+    width: 54px; height: 54px;
+    background: linear-gradient(135deg, #3f62a0, #1b365d);
+    border: 2px solid #7aaad0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px; font-weight: bold; color: #fff;
+    flex-shrink: 0;
+  }
+  .pinfo h3 { font-size: 14px; font-weight: bold; color: #1b365d; }
+  .pinfo p { font-size: 11px; color: #444; margin-top: 3px; line-height: 1.5; }
+  .online-dot { display: inline-block; width: 8px; height: 8px; background: #00aa00; border-radius: 50%; margin-right: 3px; }
+  .sep { border: none; border-top: 1px solid #ddd; margin: 5px 0; }
+  .req-legend { font-size: 10px; color: #cc0000; margin-bottom: 4px; }
+
+  /* FORM TABLE */
+  .ftable { width: 100%; border-collapse: collapse; }
+  .ftable td { padding: 3px 5px; vertical-align: middle; font-size: 12px; }
+  .flabel { width: 150px; font-weight: bold; color: #333; text-align: right; padding-right: 8px; white-space: nowrap; }
+  .flabel .req { color: #cc0000; font-size: 11px; }
+  .fval .fro {
+    background: #f8f8f8;
+    border: 1px solid #b0b0b0;
+    padding: 1px 5px;
+    font-size: 12px;
+    color: #000;
+    display: inline-block;
+    min-width: 210px;
+  }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; align-items: start; }
+  .two-col table { vertical-align: top; }
+
+  /* DATA TABLE */
+  .dtable { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .dtable thead tr { background: linear-gradient(180deg, #e2e2e1, #dcdcdb); }
+  .dtable thead th {
+    color: #333;
+    font-weight: bold;
+    font-size: 11px;
+    padding: 3px 8px;
+    text-align: left;
+    border-right: 1px solid #7a9fd0;
+    white-space: nowrap;
+  }
+  .dtable thead th:last-child { border-right: none; }
+  .dtable tbody tr { border-bottom: 1px solid #ddd; }
+  .dtable tbody tr:nth-child(even) { background: #eef4fb; }
+  .dtable tbody tr:hover { background: #d8eaf8; }
+  .dtable td { padding: 4px 8px; vertical-align: top; border-right: 1px solid #e0e0e0; line-height: 1.5; }
+  .dtable td:last-child { border-right: none; }
+  .dcol-date { white-space: nowrap; color: #444; font-size: 11px; width: 115px; }
+  .dcol-org { font-weight: bold; color: #003399; }
+  .dcol-role { color: #003399; }
+  .dcol-desc { color: #333; font-size: 11px; }
+  .badge { padding: 1px 6px; font-size: 10px; font-weight: bold; border-radius: 2px; color: #fff; }
+  .b-active { background: #007000; }
+  .b-closed { background: #777; }
+  .b-degree { background: #3f62a0; }
+
+  /* SKILL BARS */
+  .skill-row { display: flex; align-items: center; margin-bottom: 5px; gap: 8px; }
+  .skill-lbl { width: 150px; font-size: 11px; color: #333; text-align: right; flex-shrink: 0; }
+  .skill-wrap { flex: 1; height: 12px; background: #ddd; border: 1px solid #aaa; max-width: 280px; }
+  .skill-fill { height: 100%; background: linear-gradient(180deg, #e2e2e1, #dcdcdb); }
+  .skill-pct { width: 30px; font-size: 11px; color: #003399; font-weight: bold; }
+
+  /* CERT TAGS */
+  .cert-list { display: flex; flex-wrap: wrap; gap: 5px; padding: 3px 0; }
+  .cert-item {
+    background: #eef4fb;
+    border: 1px solid #7aaad0;
+    padding: 3px 9px;
+    font-size: 11px;
+    color: #003399;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .cert-item::before { content: '✔'; color: #007000; font-size: 10px; }
+  .cert-item.warn { background: #fff8e0; border-color: #ccaa00; color: #885500; }
+  .cert-item.warn::before { content: '!'; color: #cc8800; font-weight: bold; }
+
+  /* LOG TABLE */
+  .ltable { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .ltable thead th {
+    background: linear-gradient(180deg, #e2e2e1, #dcdcdb);
+    color: #333;
+    padding: 3px 8px;
+    text-align: left;
+    font-size: 11px;
+  }
+  .ltable tbody tr { border-bottom: 1px solid #e8e8e8; }
+  .ltable tbody tr:nth-child(even) { background: #f5f5f5; }
+  .ltable td { padding: 3px 8px; }
+  .ltable td.ts { color: #555; white-space: nowrap; font-family: 'Courier New', monospace; }
+  .ltable td.info { color: #007000; font-weight: bold; }
+  .ltable td.warn { color: #cc8800; font-weight: bold; }
+  .ltable td.evnt { color: #1b5faa; font-weight: bold; }
+  .ltable td.msg { color: #333; }
+
+  /* FOOTER */
+  .page-footer {
+    background: #f0f0f0;
+    border-top: 1px solid #ccc;
+    padding: 6px 10px;
+    font-size: 10px;
+    color: #666;
+    line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="cisco-header">
+  <div class="cisco-header-left">
+    <div class="cisco-logo">
+      <div class="cisco-bridge">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="cisco-wordmark">cisco</div>
+    </div>
+    <div class="cisco-header-title">
+      <h1>Cisco Unified CM Administration</h1>
+      <p>For Cisco Unified Communications Solutions</p>
+    </div>
+  </div>
+  <div class="cisco-header-right">
+    <div class="nav-row">
+      <label>Navigation</label>
+      <select class="nav-select"><option>Cisco Unified CM Administration</option></select>
+      <button class="go-btn">Go</button>
+    </div>
+    <div class="admin-row">
+      <span>admin</span>
+      <span class="pipe">|</span>
+      <a href="#">Search Documentation</a>
+      <span class="pipe">|</span>
+      <a href="#">About</a>
+      <span class="pipe">|</span>
+      <a href="#">Logout</a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV BAR -->
+<div class="nav-bar">
+  <div class="nav-item">
+    <a>System <span class="nav-arrow">▼</span></a>
+    <div class="dropdown">
+      <a href="#">Server</a>
+      <a href="#">Cisco Unified CM</a>
+      <a href="#">Enterprise Parameters</a>
+      <a href="#">Service Parameters</a>
+      <a href="#">LDAP System</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a>Call Routing <span class="nav-arrow">▼</span></a>
+    <div class="dropdown">
+      <a href="#">Directory Number</a>
+      <a href="#">Route Plan Report</a>
+      <a href="#">Translation Pattern</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a>Media Resources <span class="nav-arrow">▼</span></a>
+    <div class="dropdown">
+      <a href="#">Conference Bridge</a>
+      <a href="#">Music On Hold</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a>Advanced Features <span class="nav-arrow">▼</span></a>
+    <div class="dropdown">
+      <a href="#">Voice Mail</a>
+      <a href="#">Call Control Agent</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a>Device <span class="nav-arrow">▼</span></a>
+    <div class="dropdown">
+      <a href="#">CTI Route Point</a>
+      <a href="#">Gateway</a>
+      <a href="#">Phone</a>
+      <a href="#">Trunk</a>
+      <a href="#">Remote Destination</a>
+    </div>
+  </div>
+  <div class="nav-item open">
+    <a>User Management <span class="nav-arrow">▼</span></a>
+    <div class="dropdown">
+      <a href="#">End User</a>
+      <a href="#">Application User</a>
+      <a href="#">User Settings</a>
+      <a href="#">Credential Policy</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a>Bulk Administration <span class="nav-arrow">▼</span></a>
+    <div class="dropdown">
+      <a href="#">Upload/Download Files</a>
+      <a href="#">Users</a>
+      <a href="#">Phones</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a>Help <span class="nav-arrow">▼</span></a>
+    <div class="dropdown">
+      <a href="#">This Page</a>
+      <a href="#">Contents and Index</a>
+      <a href="#">About</a>
+    </div>
+  </div>
+</div>
+
+<!-- BREADCRUMB -->
+
+<!-- PAGE WRAPPER -->
+<div class="page-wrapper">
+
+<!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <div class="page-title-bar">
+      <h2>End User Configuration</h2>
+      <div class="page-actions">
+        <button class="abtn primary">Save</button>
+        <button class="abtn">Reset</button>
+        <button class="abtn">Apply Config</button>
+        <button class="abtn">Add New</button>
+      </div>
+    </div>
+
+    <div class="content-body">
+
+      <div class="status-box">
+        <div class="status-icon">i</div>
+        <span>Status: Record Active — Last modified 2026-03-10 09:14:22 by system. &nbsp;
+          <span style="color:#007000;font-weight:bold;">Configuration saved successfully.</span>
+        </span>
+      </div>
+
+      <!-- User Information -->
+      <div class="sbox">
+        <div class="shdr"><span class="shdr-text">User Information</span></div>
+        <div class="sbody">
+          <div class="profile-row">
+            <div class="avatar">KS</div>
+            <div class="pinfo">
+              <h3>Sampson, Kyle</h3>
+              <p><span class="online-dot"></span>Registered &amp; Active &nbsp;|&nbsp; User ID: <strong>KyleSampson</strong> &nbsp;|&nbsp; Dept: Engineering &nbsp;</p>
+              <p>Unified Communications Engineer with 5+ years of experience supporting enterprise UC infrastructure. Expertise in Cisco collaboration platforms, endpoint administration, and voice system troubleshooting.</p>
+            </div>
+          </div>
+          <hr class="sep">
+          <div class="req-legend">* indicates required field</div>
+          <div class="two-col">
+            <table class="ftable">
+              <tr><td class="flabel">User ID <span class="req">*</span></td><td class="fval"><span class="fro">kylesampson</span></td></tr>
+              <tr><td class="flabel">Last Name <span class="req">*</span></td><td class="fval"><span class="fro">Sampson</span></td></tr>
+              <tr><td class="flabel">First Name</td><td class="fval"><span class="fro">Kyle</span></td></tr>
+              <tr><td class="flabel">Title</td><td class="fval"><span class="fro">UC Engineer</span></td></tr>
+              <tr><td class="flabel">Department</td><td class="fval"><span class="fro">Engineering – Infrastructure</span></td></tr>
+            </table>
+            <table class="ftable">
+              <tr><td class="flabel">Email Address</td><td class="fval"><span class="fro"><a href="#">kylesampson52@hotmail.com</a></span></td></tr>
+              <tr><td class="flabel">Location</td><td class="fval"><span class="fro">Bemidji, MN</span></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Work Experience -->
+      <div class="sbox">
+        <div class="shdr"><span class="shdr-text">Work Experience</span></div>
+        <div class="sbody" style="padding:0;">
+          <table class="dtable">
+            <thead><tr><th>Period</th><th>Organization</th><th>Title / Role</th><th>Description</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="dcol-date">2024 — Present</td>
+                <td class="dcol-org">Sanford Health</td>
+                <td class="dcol-role">UC Engineer</td>
+                <td class="dcol-desc">Promoted to UC Engineer role. Responsible for design, implementation, and support of enterprise Cisco Unified Communications infrastructure across the organization.</td>
+                <td style="text-align:center;"><span style="display:inline-block;width:13px;height:13px;border:2px solid #555;background:#fff;text-align:center;line-height:11px;font-size:11px;font-weight:bold;color:#000;">&#10003;</span></td>
+              </tr>
+              <tr>
+                <td class="dcol-date">2020 — 2024</td>
+                <td class="dcol-org">Sanford Health</td>
+                <td class="dcol-role">UC Technician</td>
+                <td class="dcol-desc">Supported enterprise Cisco Unified Communications environment. Administered CUCM endpoints, troubleshot voice issues, and assisted with UC infrastructure projects.</td>
+                <td style="text-align:center;"><span style="display:inline-block;width:13px;height:13px;border:2px solid #555;background:#fff;"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Education -->
+      <div class="sbox">
+        <div class="shdr"><span class="shdr-text">Education</span></div>
+        <div class="sbody" style="padding:0;">
+          <table class="dtable">
+            <thead><tr><th>Year</th><th>Institution</th><th>Qualification</th><th>Honors</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="dcol-date">2019</td>
+                <td class="dcol-org">University of North Dakota</td>
+                <td class="dcol-role">B.S. Information Systems</td>
+                <td class="dcol-desc">Magna Cum Laude</td>
+              </tr>
+              <tr>
+                <td class="dcol-date">2015</td>
+                <td class="dcol-org">Northland Community &amp; Technical College</td>
+                <td class="dcol-role">A.A.S. Computer Networking</td>
+                <td class="dcol-desc">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <div class="sbox">
+        <div class="shdr"><span class="shdr-text">Skill Metrics</span></div>
+        <div class="sbody">
+          <table class="ftable">
+            <tr>
+              <td class="flabel" style="vertical-align:top;padding-top:4px;">Skills / Proficiency</td>
+              <td class="fval">
+                <select multiple size="5" style="width:320px;font-family:Arial,sans-serif;font-size:12px;border:1px solid #b0b0b0;background:#fff;padding:2px;color:#000;">
+                  <option>Cisco CUCM / UC</option>
+                  <option>Mitel 3300</option>
+                  <option>C# / Programming</option>
+                  <option>Networking / CCNA</option>
+                  <option>Project Leadership</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Certifications -->
+      <div class="sbox">
+        <div class="shdr"><span class="shdr-text">Certifications &amp; Credentials</span></div>
+        <div class="sbody">
+          <table class="ftable">
+            <tr>
+              <td class="flabel" style="vertical-align:top;padding-top:4px;">Certifications</td>
+              <td class="fval">
+                <select multiple size="3" style="width:320px;font-family:Arial,sans-serif;font-size:12px;border:1px solid #b0b0b0;background:#fff;padding:2px;color:#000;">
+                  <option>CCNA</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Audit Log -->
+      <div class="sbox">
+        <div class="shdr"><span class="shdr-text">Audit Log</span></div>
+        <div class="sbody" style="padding:0;">
+          <table class="ltable">
+            <thead><tr><th>Timestamp</th><th>Level</th><th>Message</th></tr></thead>
+            <tbody>
+              <tr><td class="ts">2026-03-14 09:14:22</td><td class="info">INFO</td><td class="msg">Profile accessed by RECRUITER\admin — VIEW operation completed</td></tr>
+              <tr><td class="ts">2026-03-14 09:13:58</td><td class="evnt">EVENT</td><td class="msg">End User record updated · work history and education committed to cluster database (PUB-01)</td></tr>
+              <tr><td class="ts">2024-01-02 08:00:00</td><td class="evnt">EVENT</td><td class="msg">Role change logged — UC Technician → UC Engineer · org: Sanford Health</td></tr>
+              <tr><td class="ts">2020-09-01 07:45:11</td><td class="evnt">EVENT</td><td class="msg">Employment record created — Sanford Health · UC Technician · status: Active</td></tr>
+              <tr><td class="ts">2019-05-15 12:00:00</td><td class="info">INFO</td><td class="msg">Education record committed — University of North Dakota · Magna Cum Laude</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="page-footer">
+  <p>Last Successful Logon: Mar 14, 2026 09:14:22</p>
+  <p>Copyright &copy; 1999 – 2026 Cisco Systems, Inc. All rights reserved.</p>
+  <p>This product contains cryptographic features and is subject to United States and local country laws governing import, export, transfer and use. Delivery of Cisco cryptographic products does not imply third-party authority to import, export, distribute or use encryption.</p>
+  <p>For information about Cisco Unified Communications Manager please visit our <a href="#">Unified Communications System Documentation</a> web site. &nbsp; For Cisco Technical Support please visit our <a href="#">Technical Support</a> web site.</p>
+</div>
+
+</body>
+</html>
