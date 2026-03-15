@@ -741,7 +741,7 @@
           <table class="ltable">
             <thead><tr><th>Timestamp</th><th>Level</th><th>Message</th></tr></thead>
             <tbody>
-              <tr><td class="ts">2026-03-14 09:14:22</td><td class="info">INFO</td><td class="msg">Profile accessed by RECRUITER\admin — VIEW operation completed</td></tr>
+              <tr><td class="ts" id="live-access-ts">2026-03-14 09:14:22</td><td class="info">INFO</td><td class="msg">Profile accessed by RECRUITER\admin — VIEW operation completed</td></tr>
               <tr><td class="ts">2026-03-14 09:13:58</td><td class="evnt">EVENT</td><td class="msg">End User record updated · work history and education committed to cluster database (PUB-01)</td></tr>
               <tr><td class="ts">2024-01-02 08:00:00</td><td class="evnt">EVENT</td><td class="msg">Role change logged — UC Technician → UC Engineer · org: Sanford Health</td></tr>
               <tr><td class="ts">2020-09-01 07:45:11</td><td class="evnt">EVENT</td><td class="msg">Employment record created — Sanford Health · UC Technician · status: Active</td></tr>
@@ -767,6 +767,12 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var overlay = document.getElementById('cucm-loading');
+
+    // Set live access timestamp
+    var now = new Date();
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    var ts = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+    document.getElementById('live-access-ts').textContent = ts;
 
     // Lock scroll until loading is done
     document.body.style.overflow = 'hidden';
