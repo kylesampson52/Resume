@@ -17,6 +17,7 @@
     padding: 0;
     display: flex;
     align-items: stretch;
+    position: relative;
     justify-content: space-between;
   }
   .cisco-header-left {
@@ -446,9 +447,10 @@
 
   /* ── LOADING OVERLAY ── */
   #cucm-loading {
-    position: absolute; inset: 0; background: #fff;
+    position: absolute; inset: 0; background: transparent;
     z-index: 9999; display: flex; align-items: center; justify-content: center;
     opacity: 1; transition: opacity 0.4s ease;
+    pointer-events: none;
   }
   #cucm-loading-box {
     background: #1e5f8a; color: #fff;
@@ -467,6 +469,9 @@
 </style>
 </head>
 <body>
+
+<!-- STICKY HEADER + NAV WRAPPER -->
+<div style="position:sticky;top:0;z-index:100;">
 
 <!-- HEADER -->
 <div class="cisco-header">
@@ -570,6 +575,8 @@
     </div>
   </div>
 </div>
+
+</div><!-- end sticky wrapper -->
 
 <!-- BREADCRUMB -->
 
@@ -763,19 +770,27 @@
   document.addEventListener('DOMContentLoaded', function () {
     var overlay = document.getElementById('cucm-loading');
 
-    // Fade out overlay after 1.8s
-    setTimeout(function () {
-      overlay.style.opacity = '0';
-      setTimeout(function () { overlay.style.display = 'none'; }, 400);
-    }, 1800);
+    // Lock scroll until loading is done
+    document.body.style.overflow = 'hidden';
 
-    // Stagger-reveal sections
+    // Stagger-reveal sections starting at 300ms
     var sections = Array.from(
       document.querySelectorAll('.page-title-bar, .status-box, .content-body > .sbox')
     );
     sections.forEach(function (el, i) {
-      setTimeout(function () { el.classList.add('revealed'); }, 1950 + i * 180);
+      setTimeout(function () { el.classList.add('revealed'); }, 1200 + i * 180);
     });
+
+    // Fade out loading box only after last section has finished fading in
+    // last section starts at 1200 + (sections.length-1)*180, plus 350ms transition = fully visible
+    var lastReveal = 1200 + (sections.length - 1) * 180 + 350;
+    setTimeout(function () {
+      overlay.style.opacity = '0';
+      setTimeout(function () {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+      }, 400);
+    }, lastReveal);
   });
 </script>
 </body>
